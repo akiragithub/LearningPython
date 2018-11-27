@@ -28,8 +28,10 @@ def simulate_linear_data(N,beta_0,beta_1,eps_sigma_sq):
             {
             'x':
                 np.random.RandomState(42).choice(
-                        map(lambda x: float(x)/100.0,np.arange(100)
-                            ),N, replace=False
+                        map(
+                                lambda x: float(x)/100.0, 
+                                np.arange(100)
+                                ), N, replace=False
                         )
             }
     )
@@ -50,4 +52,5 @@ if __name__=="__main__" :
     #Simulate the linear noisy data
     simulate_linear_data(N,beta_0,beta_1,eps_sigma_sq)
     #plot everything
-    sns.lmplot
+    sns.lmplot(x="x", y="y", data=df, size=10)
+    plt.xlim(0.0, 1.0)
