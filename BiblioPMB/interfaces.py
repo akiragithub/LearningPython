@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 
 from mabd import Mabd
 from mabiblio import Library, Book, User
-import Pmw
+import Pmw, config
 
 class Interface :
     def __init__(self):
@@ -14,7 +14,7 @@ class Interface :
         Actually I think it is not needed
         """
 
-         #creating the main window
+        # creating the main window
         self.wind = tkinter.Tk()
         self.img = ImageTk.PhotoImage(file=r'new_file1.png')
         self.wind.tk.call('wm', 'iconphoto', self.wind._w, self.img)
@@ -24,6 +24,7 @@ class Interface :
         self.is_price_checked = tkinter.IntVar()
         self.is_user_checked = tkinter.IntVar()
         self.is_classe_checked = tkinter.IntVar()
+        self.is_dispo_checked = tkinter.IntVar()
         
         self.BOOK_AVAILABLE = "1"
         self.BOOK_LEND = "0"
@@ -88,6 +89,7 @@ class Interface :
         pret_rbtn.grid(row=0, column=0, sticky="W", padx=5, pady=10)
         dispo_rbtn = tkinter.Radiobutton(l_frame_2, text="Disponible", variable = self.status, value=self.BOOK_AVAILABLE)
         dispo_rbtn.grid(row=1, column=0, sticky="W", padx=5, pady=10)
+        dispo_rbtn.select()
         tkinter.Label(l_frame, text="Mle du Preteur : ").grid(row=8, column=1, sticky="E", padx=5, pady=10)
 
         #global status
@@ -101,9 +103,8 @@ class Interface :
         self.book_price.grid(row=4, column=2, sticky="W", padx=25, pady=10)
         self.book_isbn = tkinter.Entry(l_frame, width=30)
         self.book_isbn.grid(row=5, column=2, sticky="W", padx=25, pady=10)
-        m_val = ["Tle", "1ere", "2nde", "3eme", "4eme", "5eme","6eme"]
-        m_val = m_val[::-1] # Reverse the list values for display
-        self.book_classe_spbox = tkinter.Spinbox(l_frame, width=30, values=m_val)
+        r_classes = classes[::-1] # Reverse the list values for display
+        self.book_classe_spbox = tkinter.Spinbox(l_frame, width=30, values=r_classes)
         self.book_classe_spbox.grid(row=6, column=2, sticky="W", padx=25, pady=10)
         self.user_number = tkinter.Entry(l_frame, width=30)
         self.user_number.grid(row=8, column=2, sticky="W", padx=20, pady=20)
@@ -133,21 +134,21 @@ class Interface :
         search_canvas.pack(fill="x", padx=10, pady=5)
         self.auth_chbtn = tkinter.Checkbutton(search_canvas, text="Auteur", bg="#FC902E", variable=self.is_author_checked)
         self.auth_chbtn.grid(row=1, column=1, padx=5, pady=5)
-        self.auth_spbox = tkinter.Spinbox(search_canvas, values=("Israel","Elon Musk"))
+        self.auth_spbox = tkinter.Spinbox(search_canvas, values=authors)
         self.auth_spbox.grid(row=1, column=2, padx=5, pady=5)
         self.price_chbtn = tkinter.Checkbutton(search_canvas, text="Prix", bg="#FC902E", variable=self.is_price_checked)
         self.price_chbtn.grid(row=1, column=3, padx=5, pady=5)    
-        self.price_spbox = tkinter.Spinbox(search_canvas, values=("Israel","Elon Musk"))
+        self.price_spbox = tkinter.Spinbox(search_canvas, values=prices)
         self.price_spbox.grid(row=1, column=4, padx=5, pady=5)
         self.user_chbtn = tkinter.Checkbutton(search_canvas, text="Preteur", bg="#FC902E", variable=self.is_user_checked)
         self.user_chbtn.grid(row=1, column=5, padx=5, pady=5)
-        self.pret_spbox = tkinter.Spinbox(search_canvas, values=("Israel","Elon Musk"))
+        self.pret_spbox = tkinter.Spinbox(search_canvas, values=users)
         self.pret_spbox.grid(row=1, column=6, padx=5, pady=5)
         self.classe_chbtn = tkinter.Checkbutton(search_canvas, text="Classe", bg="#FC902E", variable=self.is_classe_checked)
         self.classe_chbtn.grid(row=1, column=7, padx=5, pady=5)
-        self.classe_spbox = tkinter.Spinbox(search_canvas, values=("Israel","Elon Musk"))
+        self.classe_spbox = tkinter.Spinbox(search_canvas, values=classes)
         self.classe_spbox.grid(row=1, column=8, padx=5, pady=5)
-        self.dispo_chbtn = tkinter.Checkbutton(search_canvas, text="Dispo", bg="#FC902E")
+        self.dispo_chbtn = tkinter.Checkbutton(search_canvas, text="Dispo", bg="#FC902E", variable=self.is_dispo_checked)
         self.dispo_chbtn.grid(row=1, column=9, padx=5, pady=5)
         self.search_label = tkinter.Label(search_canvas, image=real_img, bg="#FC902E")
         self.search_label.grid(row=1, column=10, padx=5, pady=5, sticky="news")
@@ -188,7 +189,23 @@ class Interface :
     def create_book(self):
         print("create book")
 
-    def save_book(self):
+    def update_list(list_type=None, value=None, action=None) :
+
+        my_switcher = {
+                            TYPE_AUTHOR : authors,
+                            TYPE_BOOK : saved_books,
+                            TYPE_USER : users,
+                            TYPE_PRICE : prices
+                            }
+        working_list = my_switcher.get(list_type, None)
+        if action == ACTION_ADD :
+            working_list.append(value)
+        if action == ACTION_REMOVE:
+            working_list.remove(value)
+            
+
+
+    def save_book(self, book_exists=False):
         m_book = Book(self.book_reg_num.get(),
                       self.book_name.get(),
                       self.book_author.get(),
@@ -197,9 +214,9 @@ class Interface :
                       self.book_classe_spbox.get(),
                       self.user_number.get(),
                       self.status.get())
-
-        
-        m_db.add_book_to_db(                                # add book to db
+        query_op_status = None
+        if book_exists:
+            query_op_status = m_db.update_book(                               # update book in db
                             reg_num = m_book.get_reg_num(),
                             name = m_book.get_name(),
                             author = m_book.get_author(),
@@ -208,31 +225,60 @@ class Interface :
                             classe = m_book.get_classe(),
                             status = m_book.get_status()
                             )
-        # Doing remaining checking for user and avalability
-
-        #print("status is : ",self.status.get())
-        #print("book lend is : ", self.BOOK_LEND)
-
-        if self.status.get()==self.BOOK_LEND :              # if book is being lend
-            print("we are in the book_lend")
                 
+        else:                                                                       
+            query_op_status = m_db.add_book_to_db(                            # add book to db
+                            reg_num = m_book.get_reg_num(),
+                            name = m_book.get_name(),
+                            author = m_book.get_author(),
+                            price = m_book.get_price(),
+                            isbn = m_book.get_isbn(),
+                            classe = m_book.get_classe(),
+                            status = m_book.get_status()
+                            )
+            
+        if self.status.get()==self.BOOK_LEND :              # if book is being lend
             user = m_db.search_user()                           # checking if user already exists
             print("len user is : ",len(user))
             if len(user)==0 :                                   # if user doesn't exist yet
                 self.show_add_user_dialog()                          # add new user with his name
-            else :
-                m_db.update_book_user(self.book_reg_num.get(),  # add new book lent
+                
+            m_db.update_book_user(self.book_reg_num.get(),      # add new book lent
                                       self.user_number.get())
-
             m_db.update_books_read(self.book_reg_num.get(),     # add book into books list user has read
                                        self.user_number.get())
             
         elif self.status.get()==self.BOOK_AVAILABLE :       # if book is being returned
-            m_db.delete_entry_from_table(                   # delete it from books_lend
+            m_db.delete_entry_from_table(                       # delete it from books_lend
                 table_name="BOOKS_LEND",
                 entry_name="reg_num",
                 entry_value=self.book_reg_num.get())
             
+        # Showing a dialog to the user to confirm the success of operation
+        self.show_operation_status(query_op_status, ['livre', 'mis à jour'])
+
+    def show_operation_status(self, query_status, key_words=[]):
+        """
+            this method shows how operation has been terminated
+            @key_words is list of 2 elements; the first one is the
+            item we are working on : utilisateur, livre, auteur,....
+            The second element is the type of operation that has been
+            done ("supprimé", "mis à jour")
+            @query_status is the result status of the operation
+        """
+        m_message = None
+        m_title = None
+        item = key_words[0]
+        operation = key_words[1]
+        if(query_status==config.RESULT_OK):
+            m_message = item+" a été "+operation+ " avec success."
+            m_title = "Succes"
+        elif(query_status==config.RESULT_ERROR):
+            m_message = "Oups ! Cet élément n'a pas pu ëtre "+operation+".\n Veuillez réessayer"
+            m_title = "Operation non réussie"
+        tkinter.messagebox.showinfo(title=m_title, message=m_message)
+
+
     def show_add_user_dialog(self,
                              user_mle=None):
         self.my_dialog = MyDialog(self.wind,
@@ -240,9 +286,9 @@ class Interface :
                                   first_entry=self.user_number.get(),
                                   second_label="Nom Prénoms :")
 
-        self.wind.wait_window(self.mydialog.top)
-        print("mle : ", self.mydialog.user_mle)
-        print("name : ", self.mydialog.user_name)
+        self.wind.wait_window(self.my_dialog.top)
+        print("mle : ", self.my_dialog.user_mle)
+        print("name : ", self.my_dialog.user_name)
         
 
     def abort_book(confirm_save):
@@ -252,7 +298,18 @@ class Interface :
         print("Leave librairy")
 
     def delete_book(confirm_save):
+        reg_num = m_book.get_reg_num()
+        operation_status = m_db.delete_entry_from_table(
+            table_name=LIVRE,
+            entry_name="reg_num",
+            entry_value=reg_num)
+        self.show_operation_status(self,)
+        show_operation_status(self,
+                              operation_status,
+                              key_words=["livre", "supprimé"])
+        
         print("delete book")
+        
 
     def search_books(self, hack):
         "This is the function for books searching. To be defined later"
@@ -267,8 +324,8 @@ class Interface :
             user_mle = self.pret_spbox.get()
         if self.is_classe_checked.get() == 1:
             classe = self.classe_spbox.get()
-        if self.status.get() == 1:
-            m_status = self.status.get()
+        if self.is_dispo_checked.get() == 1:
+            m_status = self.is_dispo_checked()
 
         query_result = m_db.search_book(author, price, user_mle, classe, m_status)
         
@@ -276,7 +333,7 @@ class Interface :
 
     def display_result(self, results):
         for result in results:
-            ""
+            pass
             
         
        
@@ -294,22 +351,40 @@ class Interface :
 
     ##  Creating tables and views
 
+    def check_book_existence(self, reg_num=None):
+        existence = False
+        for i in saved_books:
+            if str(i) == str(reg_num):
+                existence = True
+                break
+        return existence
+    
     def confirm_save(self):
-        should_save = tkinter.messagebox.askokcancel(title="Sauvegarder", message="Voulez-vous sauvegarder ce livre ? ")
-        if should_save:
-            self.save_book()
-        #else :
-            #Do nothing
+        book_exists = self.check_book_existence(m_book.get_reg_num())
+        stat = self.status.get()
+        if stat==None:
+            stat = 2
+        print("checked status is : "+stat+".")
+        m_title = "Sauvegarder"
+        m_message = "Voulez-vous sauvegarder ce livre ? "
+        if book_exists :
+            m_title = "Mise à jour"
+            m_message = "Ce numéro a déjà été attribué à un livre. Voulez-vous procéder à cette mise à jour ?"
+        should_save = tkinter.messagebox.askokcancel(title=m_title, message=m_message)
+        if should_save :
+           self.save_book(book_exists)       
+        else :
+            pass
     def confirm_delete(self):
         should_del = tkinter.messagebox.askyesno(title="Suppression de livre", message="Etes-vous sûr de vouloir supprimer ce livre ?")
         if should_del:
             self.delete_book()
 
-    def confirm_update(self):
-        should_update = tkinter.messagebox.askyesno(title="Mise à jour", message="Voulez-vous enregistrer les modifications ?")
-        if should_update:
-            self.update_book()
-            
+##    def confirm_update(self):
+##        should_update = tkinter.messagebox.askyesno(title="Mise à jour", message="Voulez-vous enregistrer les modifications ?")
+##        if should_update:
+##            self.update_book()
+##            
     def cancel_without_saving(self):
         should_cancel = tkinter.messagebox.askyesno(title="Annuler l'édition", message="Voulez-vous annuler vos modifications ?")
         if should_cancel:
@@ -348,18 +423,24 @@ class MyDialog :
                                                value=second_entry,
                                                validate=second_validate)
         
-        self.ok_btn = tkinter.Button(top,text="OK", command=self.ok_command)
-        self.cancel_btn = tkinter.Button(top, text="Cancel", command=self.cancel_command)
-        self.first_entry_f.pack(anchor='e')
-        self.second_entry_f.pack(anchor='e')
-        self.ok_btn.pack(anchor='w')
-        self.cancel_btn.pack(anchor='e')
+        self.first_entry_f.pack(anchor='e', padx=10, pady=5)
+        self.second_entry_f.pack(anchor='e', padx=10, pady=5)
+        m_frame = tkinter.Frame(top)
+        m_frame.pack(fill='x', padx=5, pady=10)
+        
+        self.ok_btn = tkinter.Button(m_frame,text="OK", width=10,
+                                     command=lambda:self.ok_command(m_command))
+        self.cancel_btn = tkinter.Button(m_frame, text="Cancel", width=10,
+                                         command=self.cancel_command)
+        
+        self.ok_btn.pack(side='left', fill='y', padx=25)
+        self.cancel_btn.pack(side='right', fill='y', padx=25)
         #top.mainloop()
             
     def ok_command(self, m_command):
         if m_command==None:
-            self.user_mle = self.first_entry.get()
-            self.user_name = self.second_entry.get()
+            self.user_mle = self.first_entry_f.get()
+            self.user_name = self.second_entry_f.get()
         else:
             return m_command()
         self.top.destroy()
@@ -377,15 +458,32 @@ class MyDialog :
 
 if __name__ == "__main__":
     
-    #
+    # adding types for the update_list() method
+    TYPE_AUTHOR = "author"
+    TYPE_BOOK = "book"
+    TYPE_USER = "user"
+    TYPE_PRICE = "price"
+
+    #adding actions for the update_list() method
+    ACTION_ADD = "add"
+    ACTION_REMOVE = "remove"
+    
     m_book = Book()
 
-    #connecting to db and creating inexistant tables
-    m_db = Mabd(host='localhost',
+    m_db = Mabd(host='localhost',                       # connecting to db and creating inexistant tables
                 user='root',
                 passwd='')
     m_db.connect()
-    m_db.create_tables_if_not_exists()
+    m_db.create_tables_if_not_exist()
+    saved_books = list(m_db.get_saved_books_reg_num())  # Getting list of books user has saved
+    users = list(m_db.get_users())
+    authors = list(m_db.get_authors())
+    prices = list(m_db.get_prices())
+    classes = ["Tle", "1ere", "2nde", "3eme", "4eme", "5eme","6eme"]
+    print(users)
+    print(authors)
+    print(prices)
+    print(saved_books)
 
     main_interface = Interface()
 
