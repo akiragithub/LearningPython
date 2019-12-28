@@ -26,7 +26,7 @@ class Mabd:
             passwd=self.passwd)
         mycursor = mydb.cursor()
         #mycursor.execute("DROP DATABASE IF EXISTS books_db")
-        print("database succesfully deleted")
+        #print("database succesfully deleted")
         mycursor.execute("CREATE DATABASE IF NOT EXISTS books_db")
         print("database succesfully added")
         mydb = mysql.connector.connect(
@@ -60,12 +60,6 @@ class Mabd:
             mycursor.execute("""CREATE TABLE IF NOT EXISTS USER(mle INTEGER,
                              name_surname VARCHAR(100),
                              PRIMARY KEY (mle))""")
-            # table author
-            mycursor.execute("""CREATE VIEW AUTHORS AS SELECT reg_num,
-                             author FROM LIVRE""")
-            # table exemplaries
-            mycursor.execute("""CREATE VIEW EXEMPLARIES AS (SELECT name,
-                             COUNT(*) FROM LIVRE GROUP BY name)""")
             # table books_read
             mycursor.execute("""CREATE TABLE IF NOT EXISTS BOOKS_READ(
                              reg_num INTEGER NOT NULL,
@@ -80,9 +74,16 @@ class Mabd:
                              lend_date DATETIME,
                              FOREIGN KEY (reg_num) REFERENCES LIVRE(reg_num),
                              FOREIGN KEY (user_mle) REFERENCES USER(mle))""")
+            # table author
+            mycursor.execute("""CREATE VIEW AUTHORS AS SELECT reg_num,
+                             author FROM LIVRE""")
+            # table exemplaries
+            mycursor.execute("""CREATE VIEW EXEMPLARIES AS (SELECT name,
+                             COUNT(*) FROM LIVRE GROUP BY name)""")
+
             return config.RESULT_OK
         except Exception as e:
-            print("An error occured : ", str(e))
+            print("An error occured from create_tables_if_not_exist : ", str(e))
             return config.RESULT_ERROR
 
     def add_book_to_db(self,
@@ -106,7 +107,7 @@ class Mabd:
             val = (reg_num, isbn, author, name, price, classe, status)
             self.mycursor.execute(query_insert_into_books, val)
             self.mydb.commit()
-            print("book succesfully added")
+            print("book succesfully added and values are :", val)
             return config.RESULT_OK
         except Exception as e:
             print("An error occured : ", str(e))
@@ -138,7 +139,7 @@ class Mabd:
             print("book succesfully updated\n", self.mycursor.rowcount, " record(s) affected")
             return config.RESULT_OK
         except Exception as e:
-            print("An error occured : ", str(e))
+            print("An error occured from update_book : ", str(e))
             return config.RESULT_ERROR
 
 
@@ -154,6 +155,12 @@ class Mabd:
             print("An error occured : ", str(e))
             return config.RESULT_ERROR
 
+    def get_isbn(self, book_reg_num):
+        query = "SELECT isbn FROM LIVRE WHERE reg_num = %s"
+        value = (book_reg_num,)
+        self.mycursor.execute(query, value)
+        result = self.mycursor.fetchall()
+        return result
 
     def search_book(self,
                     book_author=None,
@@ -168,7 +175,7 @@ class Mabd:
         if book_user == None :
             query_search_book = query_search_book_simple
         else :
-            query_search_book = query_search_book_with_users()
+            query_search_book = query_search_book_with_users
 
         criterias = []
         total_crit = {"author":book_author,
@@ -189,14 +196,14 @@ class Mabd:
             # Time to remove the last training "AND "
             query_search_book = query_search_book[:-4]
         else :            
-            query_search_book += "LIVRE.isbn=BOOKS_LEND.isbn"
+            query_search_book += "LIVRE.isbn=BOOKS_LEND.reg_num"
         print("query search is ",query_search_book)
         
         values = tuple(valid_criteres.values())
         self.mycursor.execute(query_search_book, values)
         myresult = self.mycursor.fetchall()
-        for result in myresult:
-            print(result)
+##        for result in myresult:
+##            print(result)
         return myresult
 
     def search_user(self, mle=None):
@@ -218,7 +225,7 @@ class Mabd:
             self.mydb.commit()
             return config.RESULT_OK
         except Exception as e:
-            print("An error occured : ", str(e))
+            print("An error occured from update_book_user : ", str(e))
             return config.RESULT_ERROR
 
 
@@ -233,31 +240,43 @@ class Mabd:
                             %s, %s
                         )"""
             values = (mle, name,)
-            self.mycursor.execute()
-            self.mydb.commit()
-            return config.RESULT_OK
-        except Exception as e:
-            print("An error occured : ", str(e))
-            return config.RESULT_ERROR
-
-    def delete_entry_from_table(self,
-                                table_name=None,
-                                entry_name=None,
-                                entry_value=None):
-        """
-            Deletes any given entry from any given table when the
-            'WHERE' condition is only one column
-        """
-        try:
-            query = "DELETE FROM %s WHERE %s = %s"
-            values = (table_name, entry_name, entry_value)
             self.mycursor.execute(query, values)
             self.mydb.commit()
             return config.RESULT_OK
         except Exception as e:
-            print("An error occured : ", str(e))
+            print("An error occured from add_user_to_db : ", str(e))
+            return config.RESULT_ERROR
+
+    def delete_entry_from_livre(self,reg_num):
+        """
+            Deletes any given entry from 'livre' table when the
+            'WHERE' condition is only one column
+        """
+        try:
+            query = "DELETE FROM LIVRE WHERE reg_num = %s"
+            values = (reg_num,)
+            self.mycursor.execute(query, values)
+            self.mydb.commit()
+            return config.RESULT_OK
+        except Exception as e:
+            print("An error occured on delete_entry_from_livre : ", str(e))
             return config.RESULT_ERROR
         
+    def delete_entry_from_books_lend(self,reg_num):
+        """
+            Deletes any given entry from 'books_lend' table when the
+            'WHERE' condition is only one column
+        """
+        try:
+            query = "DELETE FROM BOOKS_LEND WHERE reg_num = %s"
+            values = (reg_num,)
+            self.mycursor.execute(query, values)
+            self.mydb.commit()
+            return config.RESULT_OK
+        except Exception as e:
+            print("An error occured on delete_entry_from_books_lend : ", str(e))
+            return config.RESULT_ERROR
+
         
     def update_books_read(self,
                           reg_num=None,
@@ -277,7 +296,29 @@ class Mabd:
             self.mydb.commit()
             return config.RESULT_OK
         except Exception as e:
-            print("An error occured : ", str(e))
+            print("An error occured on update_books_read : ", str(e))
+            return config.RESULT_ERROR
+
+    def get_current_user(self,reg_num):
+        try :
+            query = "SELECT user_mle FROM BOOKS_LEND WHERE reg_num = %s "
+            value = (reg_num,)
+            self.mycursor.execute(query, value)
+            result = self.mycursor.fetchall()
+            return result
+        except Exception as e:
+            print("An error occured while getting current user : ", str(e))
+            return config.RESULT_ERROR
+
+    def get_lend_date(self,reg_num):
+        try :
+            query = "SELECT lend_date FROM BOOKS_LEND WHERE reg_num = %s "
+            value = (reg_num,)
+            self.mycursor.execute(query, value)
+            result = self.mycursor.fetchall()
+            return result
+        except Exception as e:
+            print("An error occured while getting lend date : ", str(e))
             return config.RESULT_ERROR
 
 
@@ -295,6 +336,7 @@ class Mabd:
                 """
         self.mycursor.execute(query)
         result = self.mycursor.fetchall()
+        print("db users :", result)
         return result
     
     def get_authors(self):
@@ -303,6 +345,7 @@ class Mabd:
                     """
         self.mycursor.execute(query)
         result = self.mycursor.fetchall()
+        print("db authors :", result)
         return result
 
     def get_prices(self):
@@ -311,18 +354,10 @@ class Mabd:
                 """
         self.mycursor.execute(query)
         result = self.mycursor.fetchall()
+        print("db prices :", result)
         return result
 
-    def update_book(self,
-                    reg_num = None,
-                    name = None,
-                    author = None,
-                    price = None,
-                    isbn = None,
-                    classe = None,
-                    user_number = None,
-                    status = None):
-        print("book updated")
+    
 
         
 

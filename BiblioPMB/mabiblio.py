@@ -80,6 +80,13 @@ class Book:
     def set_num_user(self, num_user):
         self.num_user = num_user
 
+    def set_values(self, reg_number=None, name=None,
+                 author=None, price=None, isbn=None,
+                 classe=None, num_user=None, status=1):
+        self.__init__(reg_number, name,
+                 author, price, isbn,
+                 classe, num_user, status)
+
 class User:
     def __init__(self, name=None, mle=None, books_reads=[]):
         self.name = name
