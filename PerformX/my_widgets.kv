@@ -1,0 +1,155 @@
+# custom widgets for performX
+#:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+#:set color_shadow  [0, 0, 0, .299]
+
+
+<MyTestLabel@MDLabel>
+    text: "Try"
+
+<MyMDTextFieldRound@MDTextFieldRound>
+    active_color: app.theme_cls.primary_light
+    normal_color: color_shadow
+
+<MyRoundedImageButton>
+    orientation: 'vertical'
+    size_hint: None, None
+    canvas:
+        Color:
+            rgba : 1, 1, 0, 0
+        Ellipse:
+            pos: self.pos
+#            size_hint : None, None
+            size: self.size
+
+
+<MyMDIconButton@MyRoundedImageButton+MDIconButton>:
+#    size_hint: 10, 10
+#    size: 100 , 100
+
+
+<MySearchBar>
+    size_hint_x: None
+    width: self.parent.width
+    pos_hint:{'top': 0.91}
+    orientation:'horizontal'
+    MDLabel:
+        # Since I could not add horizontal padding, I am using this as padding left
+        size_hint_x : None
+        width: self.parent.width/100
+    MDIconButton:
+        id: left_return
+        icon: 'arrow-left'
+        md_bg_color: app.theme_cls.primary_color
+        pos_hint : {'top': 1}
+        size_hint_y: None
+        height: dp(40)
+        size_hint_x: None
+        width: dp(40)
+        on_release: app.go_back()
+    MDLabel:
+        pos_hint : {'top': 1}
+        size_hint_x: None
+        width: self.parent.width/2.5
+        padding_x : dp(20)
+    MDTextField:
+        hint_text: "Rechercher"
+        pos_hint : {'top': 1}
+        size_hint_x : None
+        width : self.parent.width/2
+    MDLabel:
+        # Since I could not add horizontal padding, I am using this as padding right
+        size_hint_x : None
+        width: self.parent.width/25
+
+<ClassStudentsRow>
+#    grades_cell: grades_cell
+    text_int_1: ''
+    text_int_2: ''
+    text_int_3: ''
+    text_dev_1: ''
+    text_dev_2: ''
+    name_surname_mle_text: 'AGBIDINOUKOU Joseph Samuel'
+    spacing: dp(10)
+    size_hint_x: None
+    width: dp(2000)
+    MDLabel:
+        id: name_surname_mle
+        size_hint_x: None
+        width: dp(300)
+        text: root.name_surname_mle_text
+    GradesCell:
+        id: grades_cell
+        text_int_1: root.text_int_1
+        text_int_2: root.text_int_2
+        text_int_3: root.text_int_3
+        text_dev_1: root.text_dev_1
+        text_dev_2: root.text_dev_2
+
+<GradesCell>
+    orientation: 'horizontal'
+#    size_hint_x: 1
+#    width: dp(50)
+    MDTextField:
+        id: int_1
+        text:  root.text_int_1
+    MDTextField:
+        id: int_2
+        text:  root.text_int_2
+    MDTextField:
+        id: int_3
+        text:  root.text_int_3
+    MDTextField:
+        id: dev_1
+        text:  root.text_dev_1
+    MDTextField:
+        id: dev_2
+        text:  root.text_dev_2
+
+
+<HLine>
+    canvas:
+        Color:
+            rgba: app.theme_cls.primary_color
+        Line:
+            width: 1.5
+            rectangle: (self.parent.x, self.y, self.parent.width, 0)
+
+#<MyRecycleView>
+
+<MyToolbar>
+    orientation: 'vertical'
+
+    MDToolbar:
+        id: px_tlb
+        size_hint_y: 0.09
+        title: "Acceuil"
+        md_bg_color: app.theme_cls.primary_color
+#        md_bg_color : app.theme_cls.accent_color
+        elevation: 11
+        left_action_items: [['account', lambda x : x], ['bell', lambda x : x], ['information-variant', lambda x : x]]
+        right_action_items: [['exit-to-app', lambda x: x]]
+
+    Widget:
+    # This is a hack widget to maintain toolbar at the top
+
+
+<MyUserContentNavigationDrawer@BoxLayout>
+
+    # Actually I wanted to create a MDNavigationDrawer and its content.
+    # But I aborted because I will not add no more beauty to the interface.
+    # And the interface will look too familiar with Android interfaces
+
+    orientation: 'vertical'
+
+    FloatLayout:
+        pos_hint: {'top': 1}
+        height: dp(200)
+
+        canvas:
+            Color:
+                rgba: app.theme_cls.primary_light
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:

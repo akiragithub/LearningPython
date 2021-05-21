@@ -1,0 +1,369 @@
+# kv file for my dialogs
+
+
+<AddTeacherDialog@Popup>
+    size_hint : 0.8, 0.6
+    pos_hint : {'center_x':0.5, 'center_y':0.5}
+    title: 'Ajouter'
+    my_dialog_mdcard: my_dialog_mdcard
+    name_tf: name_tf
+    surname_tf: surname_tf
+    mle_tf: mle_tf
+    classes_dd: classes_dd
+    date_tf: date_tf
+    subjects_dd: subjects_dd
+    diploma_dd: diploma_dd
+    majors_card: majors_card
+    classrooms_gl: classrooms_gl
+
+    MDCard:
+        id: my_dialog_mdcard
+        GridLayout:
+            cols: 2
+            size_hint: 1, 1
+            pos_hint: {'center_x':0.5, 'center_y':0.5}
+            spacing: dp(10)
+            padding: dp(10)
+            MDTextField:
+                id: name_tf
+                hint_text: "Nom "
+                size_hint_x: 0.4
+            MDTextField:
+                id: surname_tf
+                hint_text: "Prenoms "
+                size_hint_x: 0.4
+            MDTextField:
+                id: mle_tf
+                hint_text: "Matricule "
+                size_hint_x: 0.4
+            MDDropDownItem:
+                id: classes_dd
+                items: app.px_model.classrooms
+                size_hint_x: 0.4
+                on_select: root.on_classroom_selected()
+            MDDropDownItem:
+                id: subjects_dd
+                items : ["Matiere enseignee"] + app.px_model.topics_names
+                size_hint_x: 0.4
+            MDDropDownItem:
+                id: diploma_dd
+                size_hint_x: 0.4
+                items: ["Diplome", "Licence", "Maitrise", "Master", "Doctorat", "BAPES", "CAPES", "Autre"]
+                dropdown_bg: [0.13, 0.59, 0.95, 0.5]
+            MDLabel:
+                id: hack_lb
+                text : "Date d'entree au PMB"
+                size_hint_x: 0.4
+            MDTextField:
+                id: date_tf
+                hint_text: "aaaa/mm/jj"
+                size_hint_x: 0.4
+        MDCard:
+            id: majors_card
+            size_hint : 0.5, 1
+            GridLayout:
+                id: classrooms_gl
+                cols: 2
+#                pos_hint: {'center_x':0.5, 'center_y':0.5}
+                spacing : dp(10)
+                padding: dp(10)
+
+            MDFlatButton:
+                id: cancel_btn
+                text: "Annuler"
+                on_release: root.dismiss()
+            MDFlatButton:
+                id: save_reports_btn
+                text: "Ok"
+                on_release: root.save_teacher()
+
+<AddStudentDialog@Popup>
+    size_hint : 0.6, 0.6
+    pos_hint : {'center_x':0.5, 'center_y':0.5}
+    title: 'Ajouter'
+    name_tf: name_tf
+    surname_tf: surname_tf
+    mle_tf: mle_tf
+    classes_dd: classes_dd
+    date_tf: date_tf
+    birth_city_tf: birth_city_tf
+    countries_dd: countries_dd
+
+    MDCard:
+        id: my_dialog_mdcard
+        GridLayout:
+            cols: 2
+            size_hint: 1, 1
+            pos_hint: {'center_x':0.5, 'center_y':0.5}
+            spacing: dp(10)
+            padding: dp(10)
+            MDTextField:
+                id: name_tf
+                hint_text: "Nom "
+                size_hint_x: 1.1
+            MDTextField:
+                id: surname_tf
+                hint_text: "Prenoms"
+                size_hint_x: 1
+            MDTextField:
+                id: mle_tf
+                hint_text: "Matricule"
+            MDDropDownItem:
+                id: classes_dd
+                items: ["Classe"] + app.px_model.classrooms
+                dropdown_bg: [0.13, 0.59, 0.95, 0.5]
+            MDLabel:
+                id: date_lb
+                text: "Date de naissance"
+            MDTextField:
+                id: date_tf
+                hint_text: "aaaa/mm/jj"
+
+            MDTextField:
+                id: birth_city_tf
+                hint_text: "Ville de naissance"
+                size_hint_x: 0.4
+            MDDropDownItem:
+                id: countries_dd
+                items: ["Nationalite"] + app.px_model.countries
+                dropdown_bg: [0.13, 0.59, 0.95, 0.5]
+            MDFlatButton:
+                id: cancel_btn
+                text: "Annuler"
+                on_release: root.dismiss()
+            MDFlatButton:
+                id: save_reports_btn
+                text: "Ok"
+                on_release: root.save_student()
+
+<AddClassDialog@MyCustomDialog>
+    size_hint : 0.65, 0.77
+    pos_hint : {'center_x':0.5, 'center_y':0.5}
+    title: 'Ajouter'
+    name_dd: name_dd
+    p_teacher_dd: p_teacher_dd
+    number_of_students_tf: number_of_students_tf
+    majors_dd: majors_dd
+    topics_gl: topics_gl
+    BoxLayout:
+        orientation: 'vertical'
+        size: 1, 1
+        MDCard:
+            id: my_dialog_mdcard
+            GridLayout:
+                cols: 2
+                size_hint: 1, 0.95
+                pos_hint: {'center_x':0.5, 'center_y':0.5}
+                spacing: dp(5)
+                padding: dp(10)
+                MDDropDownItem:
+                    id: name_dd
+                    items: ["Denomination"] + app.px_model.classrooms
+                    size_hint_x: 0.4
+                MDDropDownItem:
+                    id: p_teacher_dd
+                    items: ["Professeur principal"] + app.px_model.teachers
+                    size_hint_x: 0.4
+                MDTextField:
+                    id: number_of_students_tf
+                    hint_text: "Nombre d'eleves"
+                    size_hint_x: 0.4
+                MDDropDownItem:
+                    id: majors_dd
+                    items: ["Ajouter une matiere"] + app.px_model.topics_names
+                    size_hint_x: 0.4
+                    on_select: root.on_major_selected()
+        MDCard:
+            id: majors_card
+            size_hint : 1, 1.75
+            GridLayout:
+                id: topics_gl
+                cols: 3
+                spacing : dp(10)
+                padding : dp(10)
+
+        MDCard:
+            size_hint: 1, 0.25
+            GridLayout:
+                cols: 2
+                MDFlatButton:
+                    id: cancel_btn
+                    text: "Annuler"
+                    font_style: 'btn'
+                    size_hint_x: 0.4
+                    on_release: root.dismiss()
+                MDFlatButton:
+                    id: save_reports_btn
+                    text: "Ok"
+                    font_style: 'btn'
+                    size_hint_x: 0.4
+                    on_release: root.save_class()
+
+
+<AddStatsDialog@MyCustomDialog>
+    size_hint : 0.95, 0.95
+    pos_hint : {'center_x':0.5, 'center_y':0.5}
+    title: 'Ajouter'
+    annee_academique_tf: annee_academique_tf
+    bac_percent_tf: bac_percent_tf
+    bepc_percent_tf: bepc_percent_tf
+    tle_percent_tf: tle_percent_tf
+    p_percent_tf: p_percent_tf
+    s_percent_tf: s_percent_tf
+    t_percent_tf: t_percent_tf
+    q_percent_tf: q_percent_tf
+    c_percent_tf: c_percent_tf
+    six_percent_tf: six_percent_tf
+
+    tle_h_m_tf: tle_h_m_tf
+    p_h_m_tf: p_h_m_tf
+    s_h_m_tf: s_h_m_tf
+    t_h_m_tf: t_h_m_tf
+    q_h_m_tf: q_h_m_tf
+    c_h_m_tf: c_h_m_tf
+    six_h_m_tf: six_h_m_tf
+
+    tle_l_m_tf: tle_l_m_tf
+    p_l_m_tf: p_l_m_tf
+    s_l_m_tf: s_l_m_tf
+    t_l_m_tf: t_l_m_tf
+    q_l_m_tf: q_l_m_tf
+    c_l_m_tf: c_l_m_tf
+    six_l_m_tf: six_l_m_tf
+
+    MDCard:
+        id: my_dialog_mdcard
+        GridLayout:
+            cols: 4
+            size_hint: 1, 1
+            pos_hint: {'center_x':0.5, 'center_y':0.5}
+            spacing: dp(10)
+            padding: dp(10)
+            MDTextField:
+                id: annee_academique_tf
+                hint_text: "Annee academique"
+                size_hint_x: 0.4
+            MDTextField:
+                id: tle_percent_tf
+                hint_text: "% Tle"
+                size_hint_x: 0.4
+            MDTextField:
+                id: tle_h_m_tf
+                hint_text: "Plus forte moy Tle"
+                size_hint_x: 0.4
+            MDTextField:
+                id: tle_l_m_tf
+                hint_text: "Plus faible moy Tle"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bac_percent_tf
+                hint_text: "% Bac"
+                size_hint_x: 0.4
+            MDTextField:
+                id: p_percent_tf
+                hint_text: "% Premiere"
+                size_hint_x: 0.4
+            MDTextField:
+                id: p_h_m_tf
+                hint_text: "Plus forte moy 1ere"
+                size_hint_x: 0.4
+            MDTextField:
+                id: p_l_m_tf
+                hint_text: "Plus faible moy 1ere"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bepc_percent_tf
+                hint_text: "% BEPC"
+                size_hint_x: 0.4
+            MDTextField:
+                id: s_percent_tf
+                hint_text: "% Seconde"
+                size_hint_x: 0.4
+            MDTextField:
+                id: s_h_m_tf
+                hint_text: "Plus forte moy 2nde"
+                size_hint_x: 0.4
+            MDTextField:
+                id: s_l_m_tf
+                hint_text: "Plus faible moy 2nde"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bac_h_m_tf
+                hint_text: "Plus forte moy Bac"
+                size_hint_x: 0.4
+            MDTextField:
+                id: t_percent_tf
+                hint_text: "% Troisieme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: t_h_m_tf
+                hint_text: "Plus forte moy 3eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: t_l_m_tf
+                hint_text: "Plus faible moy 3eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bepc_h_m_tf
+                hint_text: "Plus forte moy BEPC"
+                size_hint_x: 0.4
+            MDTextField:
+                id: q_percent_tf
+                hint_text: "% Quatrieme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: q_h_m_tf
+                hint_text: "Plus forte moy 4eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: q_l_m_tf
+                hint_text: "Plus faible moy 4eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bac_l_m_tf
+                hint_text: "Plus faible moy Bac"
+                size_hint_x: 0.4
+            MDTextField:
+                id: c_percent_tf
+                hint_text: "% Cinquieme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: c_h_m_tf
+                hint_text: "Plus forte moy 5eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: c_l_m_tf
+                hint_text: "Plus faible moy 5eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: bepc_l_m_tf
+                hint_text: "Plus faible moy BEPC"
+                size_hint_x: 0.4
+            MDTextField:
+                id: six_percent_tf
+                hint_text: "% Sixieme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: six_h_m_tf
+                hint_text: "Plus forte moy 6eme"
+                size_hint_x: 0.4
+            MDTextField:
+                id: six_l_m_tf
+                hint_text: "Plus faible moy 6eme"
+                size_hint_x: 0.4
+            MDLabel:
+                id: hack_lb
+                text: ""
+                size_hint_x: 0.4
+            MDFlatButton:
+                id: cancel_btn
+                text: "Annuler"
+                font_style: 'btn'
+                size_hint_x: 0.4
+                on_release: root.dismiss()
+            MDFlatButton:
+                id: save_reports_btn
+                text: "Ok"
+                font_style: 'btn'
+                size_hint_x: 0.4
+                on_release: root.save_stats()

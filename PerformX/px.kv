@@ -1,0 +1,79 @@
+# My kivy file for performX
+
+
+<MyLayout>
+    orientation: 'vertical'
+    main_scr_manager: main_scr_manager
+
+    Screen:
+
+        NavigationLayout:
+
+            ScreenManager:
+                toolbar_screen: main_screen
+                welcome_screen: welcome_screen
+#                transition: RiseInTransition()
+
+                Screen:
+                    id: main_screen
+
+                    MyToolbar:
+                        id: m_toolbar
+
+                    MyScreenManager:
+                        id: main_scr_manager
+                        welcome_screen: welcome_screen
+                        login_screen: login_screen
+                        students_screen: students_screen
+                        class_screen: class_screen
+                        teachers_screen: teachers_screen
+                        stats_screen: stats_screen
+                        class_students_screen: class_students_screen
+
+
+                        MyLoginScreen:
+                            id: login_screen
+                            name: 'login_screen'
+                        MyWelcomeScreen:
+                            id: welcome_screen
+                            name: 'welcome_screen'
+                        MyStudentScreen:
+                            id: students_screen
+                            name: 'students_screen'
+                        MyClassScreen:
+                            id: class_screen
+                            name: 'class_screen'
+                        MyTeacherScreen:
+                            id: teachers_screen
+                            name: 'teachers_screen'
+                        MyStatsScreen:
+                            id: stats_screen
+                            name: 'stats_screen'
+                        MyClassRoomStudentsScreen:
+                            id: class_students_screen
+                            name: 'class_students_screen'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#            MDNavigationDrawer:
+#
+#                MyUserContentNavigationDrawer:
+#                    id: nav_drawer
+
+
+
+
+
+

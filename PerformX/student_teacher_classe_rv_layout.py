@@ -9,11 +9,15 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivymd.app import MDApp
-from kivymd.uix.label import MDLabel
+import my_screens as m_screens
+import dbmanager
+import performx
+from datatable import DataTableLayout
 
 Builder.load_string(
     """
-<RV>:
+#:set color_shadow  [0, 0, 0, .299]
+<StudentTeacherClasseRV>:
     viewclass: 'SelectableRow'
     SelectableRecycleBoxLayout:
         default_size: None, dp(100)
@@ -21,23 +25,24 @@ Builder.load_string(
         size_hint_y : None
         height: self.minimum_height
         orientation: 'vertical'
-        multiselect: True
-        touch_multiselect: True
+        # multiselect: False
+        touch_multiselect: False
         
 <SelectableRow>:
     size_hint_x: 1
     orientation: 'horizontal'
-    padding: dp(20)
     canvas.before:
         Color: 
-            rgba: (0.1, 0.9, 0.1, 0.3) if self.selected else (0, 0, 0, 1)
+            rgba: color_shadow if self.selected  else (0.95, 0.95, 0.95, 1)
+        RoundedRectangle:
+            size: self.width, self.height
+            pos: self.x, self.y
+            radius: [20, 20, 20, 20]
     MDIconButton: 
-        pos_hint: {'top': 1.25}
+        pos_hint: {'top': .75}
         icon: "class_px.png"
     BoxLayout:
         orientation: 'vertical'
-        # spacing: dp(20)
-        # padding: dp(100)
         MDLabel:
             size_hint_y: None
             height: dp(30)
@@ -50,7 +55,7 @@ Builder.load_string(
             size_hint_y: None
             height: dp(30)
             text: root.text_3
-        HLine:
+        # HLine:
         
 <HLine>
     canvas:
@@ -61,10 +66,9 @@ Builder.load_string(
             rectangle: (self.parent.x, self.y, self.parent.width, 0)
 
             
-            
 <mainScreen>:
     rv:rv
-    RV:
+    StudentTeacherClasseRV:
         id: rv
     Button:
         text: 'reverse list'
@@ -74,6 +78,33 @@ Builder.load_string(
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior, RecycleBoxLayout):
     """ adds selection and focus behavior to the view"""
+
+
+def display_class_students(class_name):
+    my_screens = m_screens.MyScreens()
+    students = dbmanager.get_all_students_from_given_classe(class_name)
+    number_of_students = len(students)
+    topics = dbmanager.get_all_topics_of_given_classe(class_name)
+    number_of_topics = len(topics)
+    number_of_topics = 10
+    number_of_students = 6
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.classe_name = class_name
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.topics = topics
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.students = students
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.nb_of_topics = \
+        str(number_of_topics)
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.nb_of_students = \
+        str(number_of_students)
+    cells_dt = [{'cells': [[str(x) for x in range(0, 5)] for y in range(number_of_topics*number_of_students)],
+                 'nb_of_topics': number_of_topics, 'nb_of_students': number_of_students}]
+    cells_dt = [{'text_int_1': str(x), 'text_int_2': str(x + 1)} for x in range(10)]
+    # performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.rv.data = cells_dt
+    dt = DataTableLayout(cols=4, rows=5)
+    dt.size_hint_y = 5
+    performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.grades_layout.add_widget(dt)
+    # performx.PxApp.get_running_app().main_layout.main_scr_manager.class_students_screen.dt = dt
+    print("data in cells are : "+str(cells_dt))
+    my_screens.setcurrent(my_screens.class_students_screen)
 
 
 class SelectableRow(RecycleDataViewBehavior, BoxLayout):
@@ -98,16 +129,18 @@ class SelectableRow(RecycleDataViewBehavior, BoxLayout):
     def apply_selection(self, rv, index, is_selected):
         self.selected = is_selected
         if is_selected:
-            print("selection changed to {} ".format(rv.data[index]))
-            # rv.data.clear()
-            # rv.refresh_from_data()
+            # print("selection changed to {} ".format(rv.data[index]))
+            classe_name = rv.data[index]['text_1'].split(':')[1].strip()
+            # classe_name = 'essai'
+            display_class_students(classe_name)
         else:
-            print("selection removed for {}".format(rv.data[index]))
+            pass
+            # print("selection removed for {}".format(rv.data[index]))
 
 
-class RV(RecycleView):
+class StudentTeacherClasseRV(RecycleView):
     def __init__(self, **kwargs):
-        super(RV, self).__init__(**kwargs)
+        super(StudentTeacherClasseRV, self).__init__(**kwargs)
         self.data = [{'text_1': 'text_1 : '+str(x), 'text_2': 'text_2 : '+str(x), 'text_3': 'text_3 : '+str(x)} for x in range(100)]
 
 

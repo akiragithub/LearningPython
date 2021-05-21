@@ -1,0 +1,291 @@
+# My screens kv file
+
+<MyLoginScreen>
+    username: username
+    pwd: pwd
+    MDCard:
+        id: login_mdc
+        size_hint: 0.4, 0.4
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5, }
+        BoxLayout:
+            orientation: 'vertical'
+            padding : dp(20)
+            spacing : dp(20)
+            MDLabel:
+                text: 'Connexion'
+                theme_text_color: 'Primary'
+                pos_hint:{'center_x': 0.48}
+                font_style: 'Body1'
+                height: dp(36)
+            MyMDTextFieldRound:
+                id: username
+                size_hint_x: 1
+                icon_type: 'left'
+                icon_left: 'account'
+                hint_text: 'username'
+                on_focus : True
+            MyMDTextFieldRound:
+                id: pwd
+                size_hint_x: 1
+#                                    icon_type: 'all'
+                icon_left: 'key-variant'
+                icon_right: 'eye-off'
+#                                    icon_right_disabled: False
+                hint_text: 'password'
+                password: True
+                icon_callback: app.show_password()
+            MDRoundFlatButton:
+                id: conn_btn
+                text: 'Connexion'
+                font_style: 'Button'
+                pos_hint: {'center_x': 0.5}
+                on_release: root.check_login()
+
+
+<MyWelcomeScreen>
+    reports_btn: reports_btn
+    pos_hint:{"center_x": 0.55, "center_y": 0.5}
+    MyMDIconButton:
+        id: reports_btn
+        icon: f"stats_px.png"
+        pos_hint: {'center_x': 0.45, 'center_y': 0.75}
+        size_hint: None, None
+        size: 200, 200
+        on_release: root.switch_to_entities_screen('reports_btn')
+    MyMDIconButton:
+        id: students_btn
+        icon: f"student_px.png"
+        pos_hint: {'center_x': 0.25, 'center_y': 0.5}
+#        size_hint: 0.20, 0.20
+        size_hint: None, None
+        size: 180, 180
+        on_release: root.switch_to_entities_screen('students_btn')
+    MyMDIconButton:
+        id: class_btn
+        icon: f"class_px.png"
+        pos_hint: {'center_x': 0.65, 'center_y': 0.5}
+        size_hint: None, None
+        size: 200, 200
+        on_release: root.switch_to_entities_screen('class_btn')
+    MyMDIconButton:
+        id: teachers_btn
+        icon: f"teacher_px.png"
+        pos_hint: {'center_x': 0.45, 'center_y': 0.25}
+        size_hint: None, None
+        size: 200, 200
+        on_release: root.switch_to_entities_screen('teachers_btn')
+
+
+<MyClassScreen>
+    search_bar: search_bar
+#    my_avatar_list: my_avatar_list
+    cst_rv: cst_rv
+#    on_enter: my_avatar_list.add_item("DbClassroom")
+    MySearchBar:
+        id: search_bar
+#        pos_hint : { 'top': 0.82}
+    MDSeparator:
+        height: dp(2)
+        color : app.theme_cls.accent_color
+        size_hint_x : 0.5
+        pos_hint:{ 'top': 0.8, 'center_x': 0.5}
+    BoxLayout:
+        orientation: 'vertical'
+        pos_hint: {'top ': 0.8, 'center_x': 0.5}
+        size_hint : .5, 0.75
+        StudentTeacherClasseRV:
+            canvas.before:
+                Color:
+                    rgba : (0, 0.5, 0.5, 0.5)
+            id: cst_rv
+            size_hint_y: 4
+        MDFlatButton:
+            text: "Reverse list"
+            on_release: app.change_cst_rv_data()
+
+    MDFloatingActionButton:
+        pos_hint: {'right': 0.95, 'top': 0.15}
+        icon: 'plus'
+        on_release: root.add_element()
+
+#    AddClassDialog:
+#        id: add_class_dialog
+
+<MyStudentScreen>
+    search_bar: search_bar
+    my_avatar_list: my_avatar_list
+    on_pre_enter: my_avatar_list.add_item("DbStudent")
+
+    MySearchBar:
+        id: search_bar
+#        pos_hint : { 'top': 0.82}
+    MDSeparator:
+        height: dp(2)
+        color : app.theme_cls.accent_color
+        size_hint_x : 0.38
+        pos_hint:{ 'top': 0.8, 'center_x': 0.5}
+#        y : self.parent.height - search_bar.height
+
+    MyAvatarList:
+        id: my_avatar_list
+
+    MDFloatingActionButton:
+        pos_hint: {'right': 0.95, 'top': 0.15}
+        icon: 'plus'
+        on_release: root.add_element()
+
+
+<MyTeacherScreen>
+    search_bar: search_bar
+    my_avatar_list: my_avatar_list
+    on_pre_enter: my_avatar_list.add_item("DbTeacher")
+
+    MySearchBar:
+        id: search_bar
+#        pos_hint : { 'top': 0.82}
+    MDSeparator:
+        height: dp(2)
+        color : app.theme_cls.accent_color
+        size_hint_x : 0.38
+        pos_hint:{ 'top': 0.8, 'center_x': 0.5}
+#        y : self.parent.height - search_bar.height
+
+    MyAvatarList:
+        id: my_avatar_list
+
+    MDFloatingActionButton:
+        pos_hint: {'right': 0.95, 'top': 0.15}
+        icon: 'plus'
+        on_release: root.add_element()
+#    AddTeacherDialog:
+#        id: add_teacher_dialog
+
+
+<MyStatsScreen>
+    search_bar: search_bar
+    my_avatar_list: my_avatar_list
+    on_pre_enter: my_avatar_list.add_item()
+
+    MySearchBar:
+        id: search_bar
+#        pos_hint : { 'top': 0.82}
+    MDSeparator:
+        height: dp(2)
+        color : app.theme_cls.accent_color
+        size_hint_x : 0.38
+        pos_hint:{ 'top': 0.8, 'center_x': 0.5}
+#        y : self.parent.height - search_bar.height
+
+    MyAvatarList:
+        id: my_avatar_list
+
+    MDFloatingActionButton:
+        pos_hint: {'right': 0.95, 'top': 0.15}
+        icon: 'plus'
+        on_release: root.add_element()
+
+<MyClassRoomStudentsScreen>
+    grades_layout: grades_layout
+    search_bar: search_bar
+#    rv: rv
+    classe_label: classe_label
+    classe_name: ""
+    nb_of_students: ""
+    nb_of_topics : ""
+    students : []
+    topics : []
+    grades_cells : []
+#    dt : dt
+#    on_pre_enter: root.fill_rows()
+
+    MySearchBar:
+        id: search_bar
+
+    BoxLayout:
+        id: grades_layout
+        orientation: 'vertical'
+        pos_hint: {'top':0.85}
+        padding: dp(10)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: .5
+            HLine:
+                id: horizontal_line_1
+                size_hint_x: 1
+            MDLabel:
+                id: classe_label
+                size_hint_x: 1
+                text: "CLASSE "+root.classe_name
+            MDLabel:
+                id: hack_3_label
+                size_hint_x: 1.85
+                text: ""
+            MDLabel:
+                id: eff_label
+                size_hint_x: 1
+                text: "EFFECTIF : "+root.nb_of_students
+#            Button:
+#                id: hack_4_label
+#                size_hint_x: 1.85
+#                text: "reload"
+#                on_release: app.change_classes_data()
+            MDLabel:
+                id: year_label
+                size_hint_x: 1.5
+                text: "ANNEE SCOLAIRE : 2019-2020"
+                pos_hint: {'right':1}
+            HLine:
+                id: horizontal_line_2
+#            padding_y: dp(0)
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: .5
+            MDLabel:
+                id: sem_label
+                size_hint_x: 1
+                text: "SEMESTRE"
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_x: 4
+                MDLabel:
+                    id: hack_1_label
+                    size_hint_x: 1.5
+                    text: ""
+                MDLabel:
+                    id: sem_1_label
+                    size_hint_x: 1
+                    text: "SEMESTRE 1 (a gauche)"
+                MDLabel:
+                    id: hack_2_label
+                    size_hint_x: 1.5
+                    text: ""
+                MDLabel:
+                    id: sem_2_label
+                    size_hint_x: 1
+                    text: "SEMESTRE 2 (a droite)"
+                    pos_hint: {'right':1}
+            HLine:
+                id: horizontal_line_3
+        # New Line
+        BoxLayout:
+            size_hint_y: 1
+            orientation: 'horizontal'
+            MDLabel:
+                text : "NOM ET PRENOMS"
+                size_hint_x: None
+                width: dp(300)
+                padding: [50, 0]
+#
+#        DataTableLayout:
+#            id: dt
+#            cols: 2
+#            rows: 4
+
+#        MyRecycleView:
+#            id: rv
+#            size_hint_y: 9
+#        Label:
+#            size_hint_y: 2
+#            id: some_hack_label
+
+
